@@ -1,9 +1,11 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
-import { Users, Calendar, BookOpen } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { Users, Calendar, BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -43,21 +45,34 @@ const Hero = () => {
             Welcome to JNV Alumni Network
           </h1>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Connecting Navodayan graduates across generations. Join our vibrant community
-            to network, share experiences, and stay updated with latest events.
+            Connecting Navodayan graduates across generations. Join our vibrant
+            community to network, share experiences, and stay updated with
+            latest events.
           </p>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-8 mb-16">
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition duration-300">
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-wrap justify-center gap-8 mb-16"
+        >
+          <button
+            onClick={() => navigate("/register")}
+            className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition duration-300"
+          >
             Join Network
           </button>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-full text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transform hover:scale-105 transition duration-300">
+          <button
+            onClick={() => navigate("/events")}
+            className="bg-white text-blue-600 px-8 py-3 rounded-full text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transform hover:scale-105 transition duration-300"
+          >
             Explore Events
           </button>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="grid md:grid-cols-3 gap-8 mt-20">
+        <motion.div
+          variants={itemVariants}
+          className="grid md:grid-cols-3 gap-8 mt-20"
+        >
           <StatsCard
             icon={<Users className="w-8 h-8 text-blue-600" />}
             title="5000+"
@@ -79,7 +94,15 @@ const Hero = () => {
   );
 };
 
-const StatsCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
+const StatsCard = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
     className="bg-white p-6 rounded-xl shadow-lg text-center"
