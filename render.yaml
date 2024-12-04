@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: jnv-alumni-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: PORT
+        value: 5000
+      - key: CORS_ORIGIN
+        value: https://your-frontend-domain.netlify.app
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: tmp
+      mountPath: /tmp
+      sizeGB: 1
