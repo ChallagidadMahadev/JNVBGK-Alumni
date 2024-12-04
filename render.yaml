@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: jnv-alumni-backend
+    name: jnvbgk-alumni
     env: node
     buildCommand: npm install
     startCommand: npm start
@@ -8,13 +8,13 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        sync: false
+        value: mongodb+srv://mahadev:ka039814@cluster0.tiauwuh.mongodb.net/jnv_alumni
       - key: JWT_SECRET
-        sync: false
+        value: jnv-alumni-secret-key-2024
       - key: PORT
         value: 5000
       - key: CORS_ORIGIN
-        value: https://your-frontend-domain.netlify.app
+        value: https://frolicking-moonbeam-d09148.netlify.app
     healthCheckPath: /health
     autoDeploy: true
     disk:
