@@ -1,6 +1,5 @@
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
@@ -8,6 +7,7 @@ import { connectDB } from "./config/db.js";
 import { configureRoutes } from "./config/routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { initializeDatabase } from "./config/dbInit.js";
+import { configureCors } from "./config/cors.js";
 
 dotenv.config();
 
@@ -18,20 +18,7 @@ app.use(helmet());
 app.use(compression());
 
 // CORS configuration
-const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? ["https://your-frontend-domain.netlify.app"]
-      : ["http://localhost:5173"],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Authorization"],
-  maxAge: 86400, // 24 hours
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(configureCors());
 
 // Rate limiting
 const limiter = rateLimit({
