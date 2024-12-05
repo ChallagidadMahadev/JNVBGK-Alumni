@@ -20,7 +20,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={`${containerClasses} flex flex-col items-center justify-center bg-white bg-opacity-80 backdrop-blur-sm`}
+      className={`${containerClasses} flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm`}
     >
       <LoadingSpinner size="lg" />
       {message && (
@@ -28,7 +28,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-4 text-gray-600 font-medium"
+          className="mt-4 text-gray-600 font-medium text-center px-4"
         >
           {message}
         </motion.p>

@@ -36,36 +36,48 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   const containerSize = getSize();
   const dotSize = getDotSize();
 
-  const spinTransition = {
-    loop: Infinity,
-    ease: "linear",
-    duration: 1,
-  };
-
   return (
     <div className={`relative ${containerSize} ${className}`}>
-      {Object.entries(HOUSE_COLORS).map(([house, color], index) => (
-        <motion.div
-          key={house}
-          className={`absolute ${dotSize} rounded-full`}
-          style={{
-            backgroundColor: `rgb${color}`,
-            top: "50%",
-            left: "50%",
-            margin: "-4px 0 0 -4px",
-          }}
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 360],
-            x: [0, Math.cos((2 * Math.PI * index) / 4) * 20],
-            y: [0, Math.sin((2 * Math.PI * index) / 4) * 20],
-          }}
-          transition={{
-            ...spinTransition,
-            delay: index * 0.1,
-          }}
-        />
-      ))}
+      {Object.entries(HOUSE_COLORS).map(([house, color], index) => {
+        const angle = (index * Math.PI * 2) / 4;
+        const radius = size === "sm" ? 12 : size === "lg" ? 24 : 16;
+
+        return (
+          <motion.div
+            key={house}
+            className={`absolute ${dotSize} rounded-full`}
+            style={{
+              backgroundColor: `rgb(${color})`,
+              filter: "drop-shadow(0 0 2px rgba(0,0,0,0.3))",
+              top: "50%",
+              left: "50%",
+              marginTop: `-${parseInt(dotSize) / 2}px`,
+              marginLeft: `-${parseInt(dotSize) / 2}px`,
+            }}
+            animate={{
+              x: [
+                Math.cos(angle) * radius * 0.5,
+                Math.cos(angle) * radius,
+                Math.cos(angle) * radius * 0.5,
+              ],
+              y: [
+                Math.sin(angle) * radius * 0.5,
+                Math.sin(angle) * radius,
+                Math.sin(angle) * radius * 0.5,
+              ],
+              scale: [1, 1.2, 1],
+              opacity: [0.7, 1, 0.7],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              times: [0, 0.5, 1],
+              delay: index * 0.15,
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

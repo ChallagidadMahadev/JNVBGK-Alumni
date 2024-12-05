@@ -13,10 +13,7 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    if (
-      allowedOrigins.includes(origin) ||
-      process.env.NODE_ENV === "development"
-    ) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -26,6 +23,8 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   exposedHeaders: ["Authorization"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
   maxAge: 86400, // 24 hours
 };
 

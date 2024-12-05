@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isPast } from "date-fns";
 import { MapPin, Calendar, Users, Edit, Trash2 } from "lucide-react";
 import { Event } from "../../types";
 import EventCountdown from "./EventCountdown";
+import ParticipationModal from "./ParticipationModal";
+import { useAuth } from "../../context/AuthContext";
+import { registerForEvent } from "../../utils/api";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 interface EventCardProps {
   event: Event;
   isAdmin?: boolean;
   onEdit?: (event: Event) => void;
   onDelete?: (eventId: string) => void;
+  onParticipationUpdate?: () => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -17,7 +23,16 @@ const EventCard: React.FC<EventCardProps> = ({
   isAdmin = false,
   onEdit,
   onDelete,
+  onParticipationUpdate,
 }) => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const [showParticipationModal, setShowParticipationModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localRegisteredUsers, setLocalRegisteredUsers] = useState(
+    event.registeredUsers
+  );
+
   const formatDate = (dateString: string | Date) => {
     try {
       const date =
@@ -29,12 +44,81 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  const handleParticipationConfirm = async (attending: boolean) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const updatedEvent = await registerForEvent(event._id, attending);
+      setLocalRegisteredUsers(updatedEvent.registeredUsers);
+      toast.success(
+        attending
+          ? "🎉 Successfully registered for the event!"
+          : "👋 Response recorded. Maybe next time!"
+      );
+      onParticipationUpdate?.();
+      setShowParticipationModal(false);
+    } catch (error) {
+      toast.error("Failed to update participation status");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRegisterClick = () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to register for events");
+      navigate("/login");
+      return;
+    }
+    setShowParticipationModal(true);
+  };
+
+  const isRegistered = user && localRegisteredUsers.includes(user._id);
+  const isEventCompleted = isPast(new Date(event.endDate));
+
+  const getEventStatus = () => {
+    if (isEventCompleted) {
+      return isRegistered
+        ? { text: "✨ You attended this event", className: "text-green-600" }
+        : { text: "💔 You missed this event", className: "text-red-600" };
+    }
+    return isRegistered
+      ? { text: "✓ You're attending", className: "text-green-600" }
+      : { text: "○ Not registered", className: "text-gray-500" };
+  };
+
+  const status = getEventStatus();
+
+  const getButtonConfig = () => {
+    if (isEventCompleted) {
+      return null; // No button for completed events
+    }
+
+    if (isRegistered) {
+      return {
+        text: "Update Response",
+        className: "bg-green-600 hover:bg-green-700",
+      };
+    }
+
+    return {
+      text: "Register Now",
+      className: "bg-blue-600 hover:bg-blue-700",
+    };
+  };
+
+  const buttonConfig = getButtonConfig();
+
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      className="bg-white rounded-lg shadow-md overflow-hidden"
-    >
-      <div className="relative">
+    <>
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        className="bg-white rounded-lg shadow-md overflow-hidden relative"
+      >
         <img
           src={
             event.image ||
@@ -43,63 +127,84 @@ const EventCard: React.FC<EventCardProps> = ({
           alt={event.title}
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-4 right-4">
+
+        <div className="absolute top-4 right-4 space-x-2">
           <EventCountdown eventDate={event.startDate} />
         </div>
-      </div>
 
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
-        <p className="text-gray-600 mb-4">{event.description}</p>
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            {event.title}
+          </h3>
+          <p className="text-gray-600 mb-4">{event.description}</p>
 
-        <div className="space-y-2">
-          <div className="flex items-center text-gray-500">
-            <Calendar className="w-4 h-4 mr-2" />
-            <span>
-              {formatDate(event.startDate)} - {formatDate(event.endDate)}
-            </span>
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center text-gray-500">
+              <Calendar className="w-4 h-4 mr-2" />
+              <span>{formatDate(event.startDate)}</span>
+              {event.endDate !== event.startDate && (
+                <>
+                  <span className="mx-2">-</span>
+                  <span>{formatDate(event.endDate)}</span>
+                </>
+              )}
+            </div>
+
+            <div className="flex items-center text-gray-500">
+              <MapPin className="w-4 h-4 mr-2" />
+              <span>{event.location}</span>
+            </div>
+
+            <div className="flex items-center text-gray-500">
+              <Users className="w-4 h-4 mr-2" />
+              <span>{localRegisteredUsers.length} registered</span>
+            </div>
           </div>
 
-          <div className="flex items-center text-gray-500">
-            <MapPin className="w-4 h-4 mr-2" />
-            <span>{event.location}</span>
+          <div className="flex items-center justify-between">
+            <div className={`text-sm font-medium ${status.className}`}>
+              {status.text}
+            </div>
+
+            {buttonConfig && (
+              <button
+                onClick={handleRegisterClick}
+                className={`text-white py-2 px-4 rounded-md transition duration-300 ${buttonConfig.className}`}
+              >
+                {buttonConfig.text}
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center text-gray-500">
-            <Users className="w-4 h-4 mr-2" />
-            <span>{event.registeredUsers.length} registered</span>
-          </div>
+          {isAdmin && (
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => onEdit?.(event)}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => onDelete?.(event._id)}
+                className="text-red-600 hover:text-red-800"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </div>
+      </motion.div>
 
-        {isAdmin ? (
-          <div className="flex space-x-2 mt-4">
-            <button
-              onClick={() => onEdit?.(event)}
-              className="flex-1 flex items-center justify-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
-            >
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </button>
-            <button
-              onClick={() => onDelete?.(event._id)}
-              className="flex-1 flex items-center justify-center bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition duration-300"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
-            </button>
-          </div>
-        ) : (
-          <button
-            className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
-            onClick={() => {
-              /* Handle registration */
-            }}
-          >
-            Register Now
-          </button>
-        )}
-      </div>
-    </motion.div>
+      {showParticipationModal && (
+        <ParticipationModal
+          event={event}
+          isOpen={showParticipationModal}
+          onClose={() => setShowParticipationModal(false)}
+          onConfirm={handleParticipationConfirm}
+          isSubmitting={isSubmitting}
+        />
+      )}
+    </>
   );
 };
 

@@ -9,7 +9,7 @@ const api = axios.create({
     'Content-Type': 'application/json'
   },
   withCredentials: true,
-  timeout: 10000 // 10 seconds timeout
+  timeout: 15000 // Increased timeout to 15 seconds
 });
 
 // Response interceptor
@@ -21,15 +21,11 @@ api.interceptors.response.use(
     }
     
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
       const message = error.response.data?.message || 'An error occurred';
       throw new Error(message);
     } else if (error.request) {
-      // The request was made but no response was received
       throw new Error('No response from server. Please try again later.');
     } else {
-      // Something happened in setting up the request that triggered an Error
       throw new Error('Request failed. Please check your connection.');
     }
   }
@@ -43,7 +39,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Add timestamp to prevent caching
+    // Add cache-busting parameter to GET requests
     if (config.method === 'get') {
       config.params = {
         ...config.params,
@@ -59,9 +55,6 @@ api.interceptors.request.use(
 // Auth endpoints
 export const login = async (email: string, password: string) => {
   const response = await api.post('/auth/login', { email, password });
-  if (response.data.token) {
-    localStorage.setItem('token', response.data.token);
-  }
   return response.data;
 };
 
@@ -98,6 +91,12 @@ export const deleteEvent = async (id: string) => {
   const response = await api.delete(`/events/${id}`);
   return response.data;
 };
+
+export const registerForEvent = async (eventId: string, attending: boolean) => {
+  const response = await api.post(`/events/${eventId}/register`, { attending });
+  return response.data;
+};
+
 
 // News endpoints
 export const getNews = async () => {

@@ -26,7 +26,7 @@ app.use(
         defaultSrc: ["'self'"],
         connectSrc: ["'self'", process.env.CORS_ORIGIN],
         imgSrc: ["'self'", "data:", "https:"],
-        scriptSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         fontSrc: ["'self'", "https:"],
         objectSrc: ["'none'"],

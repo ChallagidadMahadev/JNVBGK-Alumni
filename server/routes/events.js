@@ -22,14 +22,75 @@ const upload = multer({
   },
 });
 
-// Get all events
+// Get all events with participation status
 router.get(
   "/",
   asyncHandler(async (req, res) => {
     const events = await Event.find()
       .sort({ startDate: 1 })
-      .populate("createdBy", "name");
-    res.json(events);
+      .populate("createdBy", "name")
+      .lean();
+
+    // Convert registeredUsers to array of strings for easier checking
+    const eventsWithStringIds = events.map((event) => ({
+      ...event,
+      registeredUsers: event.registeredUsers.map((id) => id.toString()),
+    }));
+
+    res.json(eventsWithStringIds);
+  })
+);
+
+// Register for event
+router.post(
+  "/:id/register",
+  auth,
+  asyncHandler(async (req, res) => {
+    const { attending } = req.body;
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    const userIndex = event.registeredUsers.indexOf(req.user._id);
+
+    if (attending && userIndex === -1) {
+      // Add user to registered users if not already registered
+      event.registeredUsers.push(req.user._id);
+    } else if (!attending && userIndex !== -1) {
+      // Remove user from registered users if registered
+      event.registeredUsers.splice(userIndex, 1);
+    }
+
+    await event.save();
+
+    // Convert registeredUsers to array of strings for consistency
+    const updatedEvent = event.toObject();
+    updatedEvent.registeredUsers = updatedEvent.registeredUsers.map((id) =>
+      id.toString()
+    );
+
+    res.json(updatedEvent);
+  })
+);
+
+// Get all events with participation status
+router.get(
+  "/",
+  asyncHandler(async (req, res) => {
+    const events = await Event.find()
+      .sort({ startDate: 1 })
+      .populate("createdBy", "name")
+      .lean();
+
+    // Convert registeredUsers to array of strings for easier checking
+    const eventsWithStringIds = events.map((event) => ({
+      ...event,
+      registeredUsers: event.registeredUsers.map((id) => id.toString()),
+    }));
+
+    res.json(eventsWithStringIds);
   })
 );
 
@@ -47,6 +108,12 @@ router.post(
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    if (end < start) {
+      return res
+        .status(400)
+        .json({ message: "End date must be after start date" });
     }
 
     const event = new Event({
@@ -93,6 +160,16 @@ router.put(
       }
     }
 
+    if (
+      updates.startDate &&
+      updates.endDate &&
+      updates.endDate < updates.startDate
+    ) {
+      return res
+        .status(400)
+        .json({ message: "End date must be after start date" });
+    }
+
     if (req.file) {
       updates.image = `data:${
         req.file.mimetype
@@ -122,28 +199,6 @@ router.delete(
       return res.status(404).json({ message: "Event not found" });
     }
     res.json({ message: "Event deleted successfully" });
-  })
-);
-
-// Register for event
-router.post(
-  "/:id/register",
-  auth,
-  asyncHandler(async (req, res) => {
-    const event = await Event.findById(req.params.id);
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    if (event.registeredUsers.includes(req.user._id)) {
-      return res
-        .status(400)
-        .json({ message: "Already registered for this event" });
-    }
-
-    event.registeredUsers.push(req.user._id);
-    await event.save();
-    res.json(event);
   })
 );
 

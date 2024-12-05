@@ -126,6 +126,7 @@ const Events = () => {
                   setShowEventForm(true);
                 }}
                 onDelete={() => handleDeleteEvent(event._id)}
+                onParticipationUpdate={fetchEvents}
               />
             ))}
           </div>
