@@ -86,7 +86,7 @@ const Hero = () => {
           </p>
         </motion.div>
 
-        {!isAuthenticated && (
+        {!isAuthenticated ? (
           <motion.div
             variants={itemVariants}
             className="flex flex-wrap justify-center gap-8 mb-16"
@@ -97,6 +97,18 @@ const Hero = () => {
             >
               Join Network
             </button>
+            <button
+              onClick={() => navigate("/events")}
+              className="bg-white text-blue-600 px-8 py-3 rounded-full text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transform hover:scale-105 transition duration-300"
+            >
+              Explore Events
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-wrap justify-center gap-8 mb-16"
+          >
             <button
               onClick={() => navigate("/events")}
               className="bg-white text-blue-600 px-8 py-3 rounded-full text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transform hover:scale-105 transition duration-300"
