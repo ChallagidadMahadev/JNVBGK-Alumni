@@ -13,12 +13,30 @@ dotenv.config();
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
-app.use(compression());
-
-// CORS configuration
+// CORS configuration - Must be before other middleware
 app.use(configureCors());
+
+// Security middleware
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", process.env.CORS_ORIGIN],
+        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        fontSrc: ["'self'", "https:"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+  })
+);
+
+app.use(compression());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -33,6 +51,9 @@ app.use("/api/", limiter);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// Pre-flight OPTIONS
+app.options("*", configureCors());
+
 // Configure routes
 configureRoutes(app);
 
@@ -45,11 +66,12 @@ app.get("/health", (req, res) => {
     status: "healthy",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    environment: process.env.NODE_ENV,
   });
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 50001;
 
 const startServer = async () => {
   try {
@@ -60,6 +82,7 @@ const startServer = async () => {
       console.log(
         `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
       );
+      console.log(`CORS enabled for: ${process.env.CORS_ORIGIN}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);

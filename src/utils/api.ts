@@ -1,25 +1,35 @@
 import axios from 'axios';
 import { Alumni, Event, News } from '../types';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:50001';
+const baseURL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true
+  withCredentials: true,
+  timeout: 10000 // 10 seconds timeout
 });
 
 // Response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timed out. Please try again.');
+    }
+    
     if (error.response) {
-      throw new Error(error.response.data.message || 'An error occurred');
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      const message = error.response.data?.message || 'An error occurred';
+      throw new Error(message);
     } else if (error.request) {
-      throw new Error('Server is not responding. Please try again later.');
+      // The request was made but no response was received
+      throw new Error('No response from server. Please try again later.');
     } else {
+      // Something happened in setting up the request that triggered an Error
       throw new Error('Request failed. Please check your connection.');
     }
   }
@@ -32,6 +42,15 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Add timestamp to prevent caching
+    if (config.method === 'get') {
+      config.params = {
+        ...config.params,
+        _t: Date.now()
+      };
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
