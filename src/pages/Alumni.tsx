@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import AlumniCard from "../components/alumni/AlumniCard";
 import AlumniProfileModal from "../components/alumni/AlumniProfileModal";
 import BatchSection from "../components/alumni/BatchSection";
+import LoadingOverlay from "../components/common/LoadingOverlay";
 
 const Alumni = () => {
   const [alumni, setAlumni] = useState<AlumniType[]>([]);
@@ -74,11 +75,7 @@ const Alumni = () => {
   });
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingOverlay message="Loading alumni data..." fullScreen />;
   }
 
   return (

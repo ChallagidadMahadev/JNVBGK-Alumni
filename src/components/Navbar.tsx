@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
 import { femaleProfileSvg, maleProfileSvg } from "../utils/profileIcons";
+import LoadingSpinner from "./common/LoadingSpinner";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -103,13 +104,13 @@ const Navbar = () => {
                       >
                         {isLoggingOut ? (
                           <div className="flex items-center">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700 mr-2"></div>
-                            Logging out...
+                            <LoadingSpinner size="sm" className="mr-2" />
+                            <span>Logging out...</span>
                           </div>
                         ) : (
                           <>
                             <LogOut className="w-4 h-4 mr-2" />
-                            Logout
+                            <span>Logout</span>
                           </>
                         )}
                       </button>
@@ -191,20 +192,20 @@ const Navbar = () => {
                     Settings
                   </MobileNavLink>
                   <button
-                    onClick={async () => {
-                      setIsOpen(false);
-                      await handleLogout();
-                    }}
+                    onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     {isLoggingOut ? (
                       <div className="flex items-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700 mr-2"></div>
-                        Logging out...
+                        <LoadingSpinner size="sm" className="mr-2" />
+                        <span>Logging out...</span>
                       </div>
                     ) : (
-                      "Logout"
+                      <>
+                        <LogOut className="w-4 h-4 mr-2" />
+                        <span>Logout</span>
+                      </>
                     )}
                   </button>
                 </>

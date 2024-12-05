@@ -14,6 +14,7 @@ export const initializeDatabase = async () => {
         email: "admin@jnv.com",
         password: hashedPassword,
         batchYear: 2000,
+        gender: "male",
         role: "admin",
       });
       await admin.save();
@@ -29,7 +30,8 @@ export const initializeDatabase = async () => {
           title: "Annual Alumni Meet 2024",
           description:
             "Join us for our annual alumni gathering with networking opportunities and cultural events.",
-          date: new Date("2024-12-15"),
+          startDate: new Date("2024-12-15"),
+          endDate: new Date("2024-12-16"),
           location: "JNV Campus",
           createdBy: admin._id,
           registeredUsers: [],
@@ -38,7 +40,8 @@ export const initializeDatabase = async () => {
           title: "Career Guidance Workshop",
           description:
             "Expert alumni sharing insights about various career paths and opportunities.",
-          date: new Date("2024-08-20"),
+          startDate: new Date("2024-08-20"),
+          endDate: new Date("2024-08-20"),
           location: "Virtual Event",
           createdBy: admin._id,
           registeredUsers: [],

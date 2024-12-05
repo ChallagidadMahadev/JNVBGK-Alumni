@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { register as registerUser } from "../../utils/api";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const RegisterForm = () => {
   const {
@@ -32,20 +33,14 @@ const RegisterForm = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8"
-      >
+      <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Join the JNV Alumni Network
-          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {/* Form fields remain the same */}
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label
@@ -235,10 +230,34 @@ const RegisterForm = () => {
               </Link>
             </p>
           </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <LoadingSpinner size="sm" className="mr-2" />
+              ) : (
+                "Sign up"
+              )}
+            </button>
+          </div>
+
+          <div className="text-center">
+            <Link
+              to="/login"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
+              Already have an account? Sign in
+            </Link>
+          </div>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 };
 
 export default RegisterForm;
+

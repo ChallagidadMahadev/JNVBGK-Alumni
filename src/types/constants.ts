@@ -1,8 +1,8 @@
 export const HOUSE_COLORS = {
-  'ARAVALI': 'blue',
-  'NILGIRI': 'green',
-  'SHIVALIK': 'red',
-  'UDAYAGIRI': 'yellow'
+  'ARAVALI': '(59, 130, 246)', // blue-500
+  'NILGIRI': '(34, 197, 94)',  // green-500
+  'SHIVALIK': '(239, 68, 68)', // red-500
+  'UDAYAGIRI': '(234, 179, 8)' // yellow-500
 } as const;
 
 export const OCCUPATIONS = [

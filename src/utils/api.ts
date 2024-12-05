@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Alumni, Event, News } from '../types';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:50001';
 
 const api = axios.create({
   baseURL,
@@ -39,24 +39,16 @@ api.interceptors.request.use(
 
 // Auth endpoints
 export const login = async (email: string, password: string) => {
-  try {
-    const response = await api.post('/auth/login', { email, password });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    throw error;
+  const response = await api.post('/auth/login', { email, password });
+  if (response.data.token) {
+    localStorage.setItem('token', response.data.token);
   }
+  return response.data;
 };
 
 export const register = async (userData: Partial<Alumni>) => {
-  try {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await api.post('/auth/register', userData);
+  return response.data;
 };
 
 // Event endpoints
@@ -65,13 +57,21 @@ export const getEvents = async () => {
   return response.data;
 };
 
-export const createEvent = async (eventData: Partial<Event>) => {
-  const response = await api.post('/events', eventData);
+export const createEvent = async (formData: FormData) => {
+  const response = await api.post('/events', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
   return response.data;
 };
 
-export const updateEvent = async (id: string, eventData: Partial<Event>) => {
-  const response = await api.put(`/events/${id}`, eventData);
+export const updateEvent = async (id: string, formData: FormData) => {
+  const response = await api.put(`/events/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
   return response.data;
 };
 

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { getNews } from '../utils/api';
 import { News as NewsType } from '../types';
 import { toast } from 'react-hot-toast';
+import LoadingOverlay from "../components/common/LoadingOverlay";
 
 const News = () => {
   const [news, setNews] = useState<NewsType[]>([]);
@@ -34,11 +35,7 @@ const News = () => {
     : news.filter((item) => item.category === activeCategory);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingOverlay message="Loading alumni data..." fullScreen />;
   }
 
   if (error) {

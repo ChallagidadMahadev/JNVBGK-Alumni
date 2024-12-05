@@ -109,3 +109,17 @@ export const PARTICIPATION_CATEGORIES = [
   'Social Service',
   'Others'
 ] as const;
+
+
+export interface Event {
+  _id: string;
+  title: string;
+  description: string;
+  startDate: string | Date;
+  endDate: string | Date;
+  location: string;
+  image?: string;
+  registeredUsers: string[];
+  createdBy: string;
+  createdAt: string;
+}
