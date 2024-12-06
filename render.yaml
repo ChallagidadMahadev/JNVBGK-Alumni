@@ -1,34 +1,20 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig({
-  plugins: [react()],
-  build: {
-    outDir: 'dist',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['framer-motion', 'lucide-react', 'react-hot-toast']
-        }
-      }
-    }
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom']
-  },
-  esbuild: {
-    jsxInject: `import React from 'react'`
-  }
-});
+services:
+  - type: web
+    name: jnvbgk-alumni
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    nodeVersion: 18.x
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        value: mongodb+srv://mahadev:ka039814@cluster0.tiauwuh.mongodb.net/jnv_alumni
+      - key: JWT_SECRET
+        value: jnv-alumni-secret-key-2024
+      - key: PORT
+        value: 5000
+      - key: CORS_ORIGIN
+        value: https://frolicking-moonbeam-d09148.netlify.app
+    healthCheckPath: /health
+    autoDeploy: true

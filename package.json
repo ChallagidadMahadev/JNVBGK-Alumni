@@ -12,8 +12,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "start": "ls -R node_modules/gopd && node server/index.js",
-    "postinstall": "npm install gopd@1.2.0 && node patchGopd.js || echo 'gopd installation or patching failed'"
+    "start": "node server/index.js",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -33,11 +33,12 @@
     "date-fns": "^3.3.1",
     "define-data-property": "^1.1.1",
     "dotenv": "^16.4.5",
-    "express": "^4.18.3",
+    "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
     "framer-motion": "^11.0.8",
-    "gopd": "^1.2.0",
+    "gopd": "^1.0.1",
+    "has-property-descriptors": "^1.0.1",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.344.0",
