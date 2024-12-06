@@ -12,8 +12,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "start": "node server/index.js",
-    "postinstall": "npm install gopd@1.2.0"
+    "start": "ls -R node_modules/gopd && node server/index.js",
+    "postinstall": "npm install gopd@1.2.0 || echo 'gopd installation failed, skipping'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
