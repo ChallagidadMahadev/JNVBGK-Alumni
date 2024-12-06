@@ -15,6 +15,6 @@ services:
       - key: PORT
         value: 5000
       - key: CORS_ORIGIN
-        value: https://frolicking-moonbeam-d09148.netlify.app
+        value: https://jnvbagalkot-alumni.netlify.app/
     healthCheckPath: /health
     autoDeploy: true
