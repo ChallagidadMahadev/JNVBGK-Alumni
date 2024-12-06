@@ -42,7 +42,6 @@ app.use(compression());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
 });
 
 app.use("/api/", limiter);
@@ -50,9 +49,6 @@ app.use("/api/", limiter);
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
-// Pre-flight OPTIONS
-app.options("*", configureCors());
 
 // Configure routes
 configureRoutes(app);
@@ -71,7 +67,7 @@ app.get("/health", (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 50001;
+const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
