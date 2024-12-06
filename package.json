@@ -2,7 +2,8 @@
   "name": "jnv-alumni-website",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "description": "JNV Alumni Website for connecting alumni and hosting events.",
+  "main": "server/index.js",
   "engines": {
     "node": "18.x"
   },
@@ -54,5 +55,24 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.4",
     "zod": "^3.22.4"
-  }
+  },
+  "devDependencies": {
+    "eslint": "^8.48.0",
+    "eslint-plugin-react": "^7.33.1",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  },
+  "type": "module",
+  "files": [
+    "server",
+    "node_modules/gopd"
+  ],
+  "keywords": [
+    "JNV",
+    "Alumni",
+    "Website",
+    "Networking",
+    "Events"
+  ],
+  "author": "JNV Alumni 5th Batch",
+  "license": "MIT"
 }
