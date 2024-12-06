@@ -1,3 +1,28 @@
+import { z } from 'zod';
+import { NewsCategory, NewsStatus } from './news';
+
+export interface NewsViews {
+  count: number;
+  uniqueUsers: string[];
+}
+
+export interface News {
+  _id: string;
+  title: string;
+  content: string;
+  category: z.infer<typeof NewsCategory>;
+  status: z.infer<typeof NewsStatus>;
+  image?: string;
+  author: {
+    _id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  views: NewsViews;
+  tags?: string[];
+}
+
 export interface Alumni {
   _id: string;
   name: string;
@@ -42,15 +67,7 @@ export interface Event {
   createdAt: string;
 }
 
-export interface News {
-  _id: string;
-  title: string;
-  content: string;
-  image?: string;
-  category: 'announcement' | 'achievement' | 'event' | 'general';
-  author: string;
-  createdAt: string;
-}
+
 
 export const HOUSE_COLORS = {
   ARAVALI: 'blue',

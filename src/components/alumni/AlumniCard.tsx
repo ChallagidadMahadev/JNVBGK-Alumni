@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Alumni, HOUSE_COLORS } from "../../types";
 import { maleProfileSvg, femaleProfileSvg } from "../../utils/profileIcons";
+import { useAuth } from "../../context/AuthContext";
 
 interface AlumniCardProps {
   person: Alumni;
@@ -9,6 +10,7 @@ interface AlumniCardProps {
 }
 
 const AlumniCard: React.FC<AlumniCardProps> = ({ person, onClick }) => {
+  const { isAuthenticated } = useAuth();
   const getDefaultProfilePicture = () => {
     return person.gender === "female" ? femaleProfileSvg : maleProfileSvg;
   };
@@ -34,10 +36,11 @@ const AlumniCard: React.FC<AlumniCardProps> = ({ person, onClick }) => {
     : "gray";
   const prefix = person.gender === "female" ? "Ms." : "Mr.";
 
-  const formatPhoneNumber = (phone: string | undefined) => {
-    if (!phone) return "";
-    return person.showPhoneNumber ? phone : "**********";
-  };
+ const formatPhoneNumber = (phone: string | undefined) => {
+   if (!phone) return "";
+   if (!isAuthenticated) return "**********";
+   return person.showPhoneNumber ? phone : "**********";
+ };
 
   const getHouseLetter = () => {
     if (!person.house) return null;

@@ -1,48 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { format } from 'date-fns';
-import { toast } from 'react-hot-toast';
-import { getNews, createNews, updateNews, deleteNews } from '../../utils/api';
-import { News } from '../../types';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Plus, Search } from "lucide-react";
+import { useNews } from "../../hooks/useNews";
+import NewsCard from "../../components/news/NewsCard";
+import NewsForm from "../../components/news/NewsForm";
+import NewsFilter from "../../components/news/NewsFilter";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { CreateNews } from "../../types/news";
 
 const ManageNews = () => {
-  const [news, setNews] = useState<News[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNews, setSelectedNews] = useState<News | null>(null);
+  const { getNews, createNews, updateNews, deleteNews } = useNews();
+  const { data: newsItems, isLoading } = getNews;
 
-  useEffect(() => {
-    fetchNews();
-  }, []);
+  const [showNewsForm, setShowNewsForm] = useState(false);
+  const [selectedNews, setSelectedNews] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
 
-  const fetchNews = async () => {
+  const handleCreateNews = async (data: CreateNews) => {
     try {
-      const data = await getNews();
-      setNews(Array.isArray(data) ? data : []);
+      await createNews.mutateAsync(data);
+      setShowNewsForm(false);
     } catch (error) {
-      toast.error('Failed to fetch news');
-    } finally {
-      setLoading(false);
+      console.error("Error creating news:", error);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this news article?')) {
+  const handleUpdateNews = async (data: CreateNews) => {
+    if (!selectedNews) return;
+    try {
+      await updateNews.mutateAsync({ id: selectedNews._id, news: data });
+      setSelectedNews(null);
+      setShowNewsForm(false);
+    } catch (error) {
+      console.error("Error updating news:", error);
+    }
+  };
+
+  const handleDeleteNews = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this news item?")) {
       try {
-        await deleteNews(id);
-        setNews(news.filter(item => item._id !== id));
-        toast.success('News article deleted successfully');
+        await deleteNews.mutateAsync(id);
       } catch (error) {
-        toast.error('Failed to delete news article');
+        console.error("Error deleting news:", error);
       }
     }
   };
 
-  if (loading) {
+  const filteredNews = newsItems
+    ?.filter((news) => {
+      const matchesSearch =
+        news.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        news.content.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "all" || news.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "oldest":
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        case "popular":
+          return b.viewCount - a.viewCount;
+        default: // newest
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+      }
+    });
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -52,98 +85,67 @@ const ManageNews = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Manage News</h1>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => {
               setSelectedNews(null);
-              setIsModalOpen(true);
+              setShowNewsForm(true);
             }}
             className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300"
           >
             <Plus className="w-5 h-5 mr-2" />
             Add News
-          </button>
+          </motion.button>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {news.map((item) => (
-                <motion.tr
-                  key={item._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      {item.image && (
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <img
-                            className="h-10 w-10 rounded object-cover"
-                            src={item.image}
-                            alt=""
-                          />
-                        </div>
-                      )}
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {item.title}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      item.category === 'announcement' ? 'bg-blue-100 text-blue-800' :
-                      item.category === 'achievement' ? 'bg-green-100 text-green-800' :
-                      item.category === 'event' ? 'bg-purple-100 text-purple-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {format(new Date(item.createdAt), 'PPP')}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => {
-                        setSelectedNews(item);
-                        setIsModalOpen(true);
-                      }}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <NewsFilter
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+
+        {filteredNews?.length === 0 ? (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No News Found
+            </h3>
+            <p className="text-gray-600">
+              {searchTerm || selectedCategory !== "all"
+                ? "Try adjusting your filters"
+                : "Click the 'Add News' button to create your first news item"}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredNews?.map((news) => (
+              <NewsCard
+                key={news._id}
+                news={news}
+                isAdmin={true}
+                onEdit={() => {
+                  setSelectedNews(news);
+                  setShowNewsForm(true);
+                }}
+                onDelete={() => handleDeleteNews(news._id)}
+              />
+            ))}
+          </div>
+        )}
+
+        {showNewsForm && (
+          <NewsForm
+            initialData={selectedNews}
+            onSubmit={selectedNews ? handleUpdateNews : handleCreateNews}
+            onClose={() => {
+              setShowNewsForm(false);
+              setSelectedNews(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );

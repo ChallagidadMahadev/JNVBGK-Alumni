@@ -1,7 +1,8 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Phone, MapPin, Briefcase, Award, Home } from "lucide-react";
-import { Alumni, HOUSE_COLORS, OCCUPATION_PREFIXES } from "../../types";
+import { motion } from "framer-motion";
+import { X, Phone, Mail, MapPin, Briefcase, Award } from "lucide-react";
+import { Alumni, HOUSE_COLORS } from "../../types";
+import { useAuth } from "../../context/AuthContext";
 import { maleProfileSvg, femaleProfileSvg } from "../../utils/profileIcons";
 
 interface AlumniProfileModalProps {
@@ -15,153 +16,167 @@ const AlumniProfileModal: React.FC<AlumniProfileModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { isAuthenticated } = useAuth();
+
   const getDefaultProfilePicture = () => {
     return alumni.gender === "female" ? femaleProfileSvg : maleProfileSvg;
+  };
+
+  const formatPhoneNumber = (phone: string | undefined) => {
+    if (!phone) return "";
+    if (!isAuthenticated) return "**********";
+    return alumni.showPhoneNumber ? phone : "**********";
   };
 
   const houseColor = alumni.house
     ? HOUSE_COLORS[alumni.house as keyof typeof HOUSE_COLORS]
     : "gray";
-  
-    const prefix = alumni.gender === "female" ? "Ms." : "Mr.";
-
-
-  const formatPhoneNumber = (phone: string | undefined) => {
-    if (!phone) return "";
-    return alumni.showPhoneNumber ? phone : "**********";
-  };
+  const prefix = alumni.gender === "female" ? "Ms." : "Mr.";
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[60] overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+    <>
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50"
+        onClick={onClose}
+      />
+
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden relative"
+          >
+            <button
               onClick={onClose}
-            />
-
-            <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
-              aria-hidden="true"
+              className="absolute top-4 right-4 z-50 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors duration-200"
             >
-              &#8203;
-            </span>
+              <X className="w-6 h-6 text-gray-600" />
+            </button>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-            >
-              <div className="absolute top-0 right-0 pt-4 pr-4 z-[70]">
-                <button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                >
-                  <X className="h-6 w-6" />
-                </button>
+            <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-500">
+              <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                <img
+                  src={alumni.profilePicture || getDefaultProfilePicture()}
+                  alt={alumni.name}
+                  className="w-32 h-32 rounded-full border-4 border-white object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="pt-20 px-6 pb-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {prefix} {alumni.name}
+                </h2>
+                <p className="text-gray-600">Batch of {alumni.batchYear}</p>
+                {alumni.house && (
+                  <span
+                    className="inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium"
+                    style={{
+                      backgroundColor: `rgba(${houseColor}, 0.1)`,
+                      color: `rgb(${houseColor})`,
+                    }}
+                  >
+                    {alumni.house} House
+                  </span>
+                )}
               </div>
 
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="w-full">
-                    <div className="flex flex-col items-center mb-6">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        className="relative"
-                      >
-                        <img
-                          src={
-                            alumni.profilePicture || getDefaultProfilePicture()
-                          }
-                          alt={alumni.name}
-                          className="w-32 h-32 rounded-full object-cover ring-4"
-                          style={{ borderColor: `var(--${houseColor}-500)` }}
-                        />
-                        {alumni.house && (
-                          <span
-                            className="absolute bottom-0 right-0 w-8 h-8 rounded-full border-4 border-white"
-                            style={{
-                              backgroundColor: `var(--${houseColor}-500)`,
-                            }}
-                          />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {alumni.phoneNumber && (
+                  <div className="flex items-center space-x-3">
+                    <Phone className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Phone</p>
+                      <p className="text-gray-900">
+                        {formatPhoneNumber(alumni.phoneNumber)}
+                        {(!isAuthenticated || !alumni.showPhoneNumber) && (
+                          <span className="text-xs text-gray-500 ml-2">
+                            {!isAuthenticated ? "(Login to view)" : "(Private)"}
+                          </span>
                         )}
-                      </motion.div>
-                      <h3 className="mt-4 text-2xl font-bold text-gray-900">
-                        {prefix} {alumni.name}
-                      </h3>
-                      <p className="text-gray-600">
-                        Batch of {alumni.batchYear}
                       </p>
                     </div>
+                  </div>
+                )}
 
-                    <div className="space-y-4">
-                      {alumni.phoneNumber && (
-                        <div className="flex items-center">
-                          <Phone className="w-5 h-5 text-gray-400 mr-2" />
-                          <span>{formatPhoneNumber(alumni.phoneNumber)}</span>
-                          {!alumni.showPhoneNumber && (
-                            <span className="ml-2 text-sm text-gray-500">
-                              (Private)
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {alumni.house && (
-                        <div className="flex items-center">
-                          <Home className="w-5 h-5 text-gray-400 mr-2" />
-                          <span>{alumni.house} House</span>
-                        </div>
-                      )}
-
-                      {alumni.occupation && alumni.occupation !== "Others" && (
-                        <div className="flex items-center">
-                          <Briefcase className="w-5 h-5 text-gray-400 mr-2" />
-                          <span>
-                            {alumni.occupation}
-                            {alumni.occupationSubField &&
-                              alumni.occupationSubField !== "Others" &&
-                              ` - ${alumni.occupationSubField}`}
-                          </span>
-                        </div>
-                      )}
-
-                      {alumni.participation &&
-                        alumni.participation.length > 0 && (
-                          <div className="flex items-start">
-                            <Award className="w-5 h-5 text-gray-400 mr-2 mt-1" />
-                            <div>
-                              <span className="font-medium">
-                                Areas of Participation:
-                              </span>
-                              <ul className="list-disc list-inside ml-4">
-                                {alumni.participation
-                                  .filter((area) => area !== "Others")
-                                  .map((area) => (
-                                    <li key={area}>{area}</li>
-                                  ))}
-                                {alumni.customParticipation && (
-                                  <li>{alumni.customParticipation}</li>
-                                )}
-                              </ul>
-                            </div>
-                          </div>
-                        )}
-                    </div>
+                <div className="flex items-center space-x-3">
+                  <Mail className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Email</p>
+                    <p className="text-gray-900">{alumni.email}</p>
                   </div>
                 </div>
+
+                {alumni.address && (
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Address
+                      </p>
+                      <p className="text-gray-900">{alumni.address}</p>
+                    </div>
+                  </div>
+                )}
+
+                {alumni.occupation && (
+                  <div className="flex items-center space-x-3">
+                    <Briefcase className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Occupation
+                      </p>
+                      <p className="text-gray-900">
+                        {alumni.occupation}
+                        {alumni.occupationSubField &&
+                          alumni.occupationSubField !== "Others" && (
+                            <span className="text-gray-600">
+                              {" "}
+                              - {alumni.occupationSubField}
+                            </span>
+                          )}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-            </motion.div>
-          </div>
+
+              {alumni.participation && alumni.participation.length > 0 && (
+                <div className="mt-6">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <Award className="w-5 h-5 text-gray-400" />
+                    <p className="text-sm font-medium text-gray-500">
+                      Areas of Participation
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {alumni.participation
+                      .filter((p) => p !== "Others")
+                      .map((item) => (
+                        <span
+                          key={item}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    {alumni.customParticipation && (
+                      <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                        {alumni.customParticipation}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
-      )}
-    </AnimatePresence>
+      </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Alumni, Event, News } from '../types';
+import { CreateNews, UpdateNews } from '../types/news';
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -98,26 +99,7 @@ export const registerForEvent = async (eventId: string, attending: boolean) => {
 };
 
 
-// News endpoints
-export const getNews = async () => {
-  const response = await api.get('/news');
-  return response.data;
-};
 
-export const createNews = async (newsData: Partial<News>) => {
-  const response = await api.post('/news', newsData);
-  return response.data;
-};
-
-export const updateNews = async (id: string, newsData: Partial<News>) => {
-  const response = await api.put(`/news/${id}`, newsData);
-  return response.data;
-};
-
-export const deleteNews = async (id: string) => {
-  const response = await api.delete(`/news/${id}`);
-  return response.data;
-};
 
 // Alumni endpoints
 export const getAlumni = async () => {
@@ -132,6 +114,32 @@ export const updateProfile = async (formData: FormData) => {
     }
   });
   return response.data;
+};
+
+
+// News endpoints
+export const getNews = async (): Promise<News[]> => {
+  const { data } = await api.get<News[]>('/news');
+  return data;
+};
+
+export const createNews = async (news: CreateNews): Promise<News> => {
+  const { data } = await api.post<News>('/news', news);
+  return data;
+};
+
+export const updateNews = async ({ _id, ...news }: UpdateNews & { _id: string }): Promise<News> => {
+  const { data } = await api.put<News>(`/news/${_id}`, news);
+  return data;
+};
+
+export const deleteNews = async (id: string): Promise<void> => {
+  await api.delete(`/news/${id}`);
+};
+
+export const incrementNewsViews = async (id: string): Promise<{ viewCount: number }> => {
+  const { data } = await api.post<{ viewCount: number }>(`/news/${id}/view`);
+  return data;
 };
 
 export default api;

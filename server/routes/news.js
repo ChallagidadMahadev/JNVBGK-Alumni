@@ -9,7 +9,9 @@ const router = express.Router();
 router.get(
   "/",
   asyncHandler(async (req, res) => {
-    const news = await News.find().sort({ createdAt: -1 });
+    const news = await News.find()
+      .populate("author", "name")
+      .sort({ createdAt: -1 });
     res.json(news);
   })
 );
@@ -22,9 +24,14 @@ router.post(
     const news = new News({
       ...req.body,
       author: req.user._id,
+      viewCount: 0,
     });
     await news.save();
-    res.status(201).json(news);
+    const populatedNews = await News.findById(news._id).populate(
+      "author",
+      "name"
+    );
+    res.status(201).json(populatedNews);
   })
 );
 
@@ -33,10 +40,12 @@ router.put(
   "/:id",
   adminAuth,
   asyncHandler(async (req, res) => {
-    const news = await News.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const news = await News.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedAt: new Date() },
+      { new: true, runValidators: true }
+    ).populate("author", "name");
+
     if (!news) {
       return res.status(404).json({ message: "News not found" });
     }
@@ -54,6 +63,24 @@ router.delete(
       return res.status(404).json({ message: "News not found" });
     }
     res.json({ message: "News deleted successfully" });
+  })
+);
+
+// Increment view count
+router.post(
+  "/:id/view",
+  asyncHandler(async (req, res) => {
+    const news = await News.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { viewCount: 1 } },
+      { new: true }
+    );
+
+    if (!news) {
+      return res.status(404).json({ message: "News not found" });
+    }
+
+    res.json({ viewCount: news.viewCount });
   })
 );
 
