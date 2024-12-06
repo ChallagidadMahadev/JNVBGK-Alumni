@@ -46,7 +46,12 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <GraduationCap className="h-8 w-8 text-blue-600" />
+              {/* <GraduationCap className="h-8 w-8 text-blue-600" /> */}
+              <img
+                src="/JNV logo.png"
+                alt="JNV Logo"
+                className="h-10 w-10 rounded-full object-cover border-2 border-blue-600"
+              />
               <span className="text-xl font-bold text-gray-800">
                 JNVBGK Alumni
               </span>
