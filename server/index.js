@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration - Must be before other middleware
+// CORS configuration
 app.use(configureCors());
 
 // Security middleware
@@ -40,8 +40,8 @@ app.use(compression());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
 });
 
 app.use("/api/", limiter);
