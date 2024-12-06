@@ -21,3 +21,8 @@ services:
       name: tmp
       mountPath: /tmp
       sizeGB: 1
+    buildFilter:
+      paths:
+        - package.json
+        - server/**
+        - src/**
