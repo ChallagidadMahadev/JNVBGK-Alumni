@@ -5,6 +5,7 @@ import { Users, Calendar, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getAlumni, getEvents } from "../utils/api";
+import ImageSlider from "./ImageSlider";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ const Hero = () => {
       animate={inView ? "visible" : "hidden"}
       className="min-h-screen pt-16 bg-gradient-to-b from-blue-50 to-white"
     >
+      <ImageSlider />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <motion.div variants={itemVariants} className="text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
