@@ -2,8 +2,7 @@
   "name": "jnv-alumni-website",
   "private": true,
   "version": "1.0.0",
-  "description": "JNV Alumni Website for connecting alumni and hosting events.",
-  "main": "server/index.js",
+  "type": "module",
   "engines": {
     "node": "18.x"
   },
@@ -13,8 +12,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "start": "node server/index.js",
-    "postinstall": "npm install gopd@1.2.0 || echo 'gopd installation failed, skipping'"
+    "start": "node server/index.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -37,14 +35,12 @@
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
     "framer-motion": "^11.0.8",
-    "gopd": "^1.2.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.344.0",
     "mongoose": "^8.2.1",
     "multer": "^1.4.5-lts.1",
     "postcss": "^8.4.35",
-    "qs": "^6.11.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.51.0",
@@ -55,24 +51,5 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.4",
     "zod": "^3.22.4"
-  },
-  "devDependencies": {
-    "eslint": "^8.48.0",
-    "eslint-plugin-react": "^7.33.1",
-    "eslint-plugin-react-hooks": "^4.6.0"
-  },
-  "type": "module",
-  "files": [
-    "server",
-    "node_modules/gopd"
-  ],
-  "keywords": [
-    "JNV",
-    "Alumni",
-    "Website",
-    "Networking",
-    "Events"
-  ],
-  "author": "JNV Alumni 5th Batch",
-  "license": "MIT"
+  }
 }

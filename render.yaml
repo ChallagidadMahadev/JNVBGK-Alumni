@@ -18,7 +18,3 @@ services:
         value: https://frolicking-moonbeam-d09148.netlify.app
     healthCheckPath: /health
     autoDeploy: true
-    disk:
-      name: tmp
-      mountPath: /tmp
-      sizeGB: 1
