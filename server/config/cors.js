@@ -5,7 +5,7 @@ const corsOptions = {
     // List of allowed origins
     const allowedOrigins = [
       "http://localhost:5173",
-      "https://frolicking-moonbeam-d09148.netlify.app",
+      "https://jnvbagalkot-alumni.netlify.app",
     ];
 
     // Allow requests with no origin (like mobile apps or curl requests)
