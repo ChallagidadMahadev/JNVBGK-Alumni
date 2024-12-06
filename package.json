@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "start": "ls -R node_modules/gopd && node server/index.js",
-    "postinstall": "npm install gopd@1.2.0 || echo 'gopd installation failed, skipping'"
+    "postinstall": "npm install gopd@1.2.0 && node patchGopd.js || echo 'gopd installation or patching failed'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

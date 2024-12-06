@@ -1,19 +1,21 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
-const gopdPath = path.resolve(__dirname, "node_modules", "gopd", "index.js");
+console.log("Running patchGopd.js...");
 
-if (fs.existsSync(gopdPath)) {
-  console.log("Found gopd/index.js");
-  let content = fs.readFileSync(gopdPath, "utf-8");
-  if (content.includes(`require('./gOPD')`)) {
-    console.log("Found problematic require statement in gopd/index.js");
-    content = content.replace(`require('./gOPD')`, `require('./index.js')`);
-    fs.writeFileSync(gopdPath, content, "utf-8");
-    console.log("Patched gopd/index.js successfully");
-  } else {
-    console.log("No problematic require statement found in gopd/index.js");
+const tsconfigPath = path.resolve("node_modules", "gopd", "tsconfig.json");
+
+if (fs.existsSync(tsconfigPath)) {
+  console.log("Found gopd/tsconfig.json");
+  let content = fs.readFileSync(tsconfigPath, "utf-8");
+  try {
+    // Remove problematic "extends" line using regex
+    content = content.replace(/"extends":\s*".*?",?\s*/g, "");
+    fs.writeFileSync(tsconfigPath, content, "utf-8");
+    console.log("Patched gopd/tsconfig.json successfully");
+  } catch (error) {
+    console.error("Error patching gopd/tsconfig.json:", error.message);
   }
 } else {
-  console.error("gopd/index.js not found for patching");
+  console.error("gopd/tsconfig.json not found for patching");
 }
