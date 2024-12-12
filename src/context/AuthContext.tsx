@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import api from "../utils/api";
+import { toast } from "react-hot-toast";
+import { login as apiLogin } from "../utils/api";
 
 interface AuthContextType {
   user: any;
@@ -16,40 +17,78 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      api
-        .get("/auth/me")
-        .then((response) => {
-          setUser(response.data);
+    const initAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/auth/me`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) throw new Error("Invalid token");
+
+          const userData = await response.json();
+          setUser(userData);
           setIsAuthenticated(true);
-        })
-        .catch(() => {
+        } catch (error) {
+          console.error("Auth initialization error:", error);
           localStorage.removeItem("token");
-          setUser(null);
-          setIsAuthenticated(false);
-        });
-    }
+        }
+      }
+      setIsLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post("/auth/login", { email, password });
-      localStorage.setItem("token", response.data.token);
-      setUser(response.data.user);
+      const response = await apiLogin(email, password);
+      setUser(response.user);
       setIsAuthenticated(true);
+      toast.success(`Welcome back ${response.user.name || email}!`, {
+        position: "bottom-center",
+      });
+      return response;
     } catch (error) {
+      console.error("Login error:", error);
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    setIsAuthenticated(false);
+    const loadingToast = toast.loading("Logging out...", {
+      position: "bottom-center",
+    });
+
+    // Simulate a small delay for UX
+    setTimeout(() => {
+      localStorage.removeItem("token");
+      setUser(null);
+      setIsAuthenticated(false);
+
+      toast.dismiss(loadingToast);
+      toast.success("Logged out successfully", {
+        position: "bottom-center",
+      });
+    }, 1000);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider

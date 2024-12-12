@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Alumni, Event, News } from '../types';
 import { CreateNews, UpdateNews } from '../types/news';
+import { Batch } from '../types/batch';
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -13,25 +14,6 @@ const api = axios.create({
   timeout: 15000 // Increased timeout to 15 seconds
 });
 
-// Response interceptor
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.code === 'ECONNABORTED') {
-      throw new Error('Request timed out. Please try again.');
-    }
-    
-    if (error.response) {
-      const message = error.response.data?.message || 'An error occurred';
-      throw new Error(message);
-    } else if (error.request) {
-      throw new Error('No response from server. Please try again later.');
-    } else {
-      throw new Error('Request failed. Please check your connection.');
-    }
-  }
-);
-
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
@@ -39,24 +21,88 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
-    // Add cache-busting parameter to GET requests
-    if (config.method === 'get') {
-      config.params = {
-        ...config.params,
-        _t: Date.now()
-      };
-    }
-    
     return config;
   },
   (error) => Promise.reject(error)
 );
 
+// Response interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Only remove token if it's an invalid token error
+      if (error.response?.data?.message === 'Invalid token') {
+        localStorage.removeItem('token');
+      }
+      
+      // Only redirect to login if not already on auth-related pages
+      const nonAuthPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+      if (!nonAuthPaths.some(path => window.location.pathname.includes(path))) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Auth endpoints
 export const login = async (email: string, password: string) => {
-  const response = await api.post('/auth/login', { email, password });
-  return response.data;
+  try {
+    const { data } = await api.post('/auth/login', { email, password });
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
+    return data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
+// // Auth endpoints old with expireIN 15minutes
+// export const login = async (email: string, password: string) => {
+//   try {
+//     const { data } = await api.post('/auth/login', { email, password });
+//     if (data.token) {
+//       localStorage.setItem('token', data.token);
+//     }
+//     return data;
+//   } catch (error) {
+//     console.error('Login error:', error);
+//     throw new Error('Invalid credentials');
+//   }
+// };
+
+export const requestPasswordReset = async (email: string): Promise<void> => {
+  try {
+    await api.post('/auth/forgot-password', { email });
+  } catch (error) {
+    console.error('Password reset request error:', error);
+    throw new Error('Failed to send reset email');
+  }
+};
+
+export const verifyOTP = async (email: string, otp: string): Promise<{ resetToken: string }> => {
+  try {
+    const { data } = await api.post('/auth/verify-otp', { email, otp });
+    return data;
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    throw new Error('Invalid OTP');
+  }
+};
+
+export const resetPassword = async (resetToken: string, password: string): Promise<void> => {
+  try {
+    await api.post('/auth/reset-password', 
+      { password },
+      { headers: { Authorization: `Bearer ${resetToken}` } }
+    );
+  } catch (error) {
+    console.error('Password reset error:', error);
+    throw new Error('Failed to reset password');
+  }
 };
 
 export const register = async (userData: Partial<Alumni>) => {
@@ -140,6 +186,33 @@ export const deleteNews = async (id: string): Promise<void> => {
 export const incrementNewsViews = async (id: string): Promise<{ viewCount: number }> => {
   const { data } = await api.post<{ viewCount: number }>(`/news/${id}/view`);
   return data;
+};
+
+
+
+
+
+
+// Batch endpoints
+export const getBatches = async (): Promise<Batch[]> => {
+  const { data } = await api.get<Batch[]>('/batches');
+  return data;
+};
+
+export const uploadBatch = async (formData: FormData): Promise<Batch> => {
+  const { data } = await api.post<Batch>('/batches/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return data;
+};
+
+export const updateBatch = async (id: string, batch: Partial<Batch>): Promise<Batch> => {
+  const { data } = await api.put<Batch>(`/batches/${id}`, batch);
+  return data;
+};
+
+export const deleteBatch = async (id: string): Promise<void> => {
+  await api.delete(`/batches/${id}`);
 };
 
 export default api;

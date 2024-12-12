@@ -28,3 +28,24 @@ export const adminAuth = asyncHandler(async (req, res, next) => {
     next();
   });
 });
+
+export const validateResetToken = (req, res, next) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
+    if (!token) {
+      return res.status(401).json({ message: "Reset token required" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.purpose !== "reset") {
+      return res.status(401).json({ message: "Invalid reset token" });
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Invalid or expired reset token" });
+  }
+};

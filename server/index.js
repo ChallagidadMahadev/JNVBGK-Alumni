@@ -9,6 +9,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { initializeDatabase } from "./config/dbInit.js";
 import { configureCors } from "./config/cors.js";
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -78,7 +79,9 @@ const startServer = async () => {
       console.log(
         `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
       );
-      console.log(`CORS enabled for: ${process.env.CORS_ORIGIN}`);
+      if (process.env.CORS_ORIGIN) {
+        console.log(`CORS enabled for: ${process.env.CORS_ORIGIN}`);
+      }
     });
   } catch (error) {
     console.error("Failed to start server:", error);

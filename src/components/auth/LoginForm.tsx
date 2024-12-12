@@ -17,7 +17,7 @@ const LoginForm = () => {
   const onSubmit = async (data: any) => {
     try {
       await login(data.email, data.password);
-      toast.success("Login successful!");
+      toast.success(`Welcome back ${data.email}!`);
       navigate("/alumni");
     } catch (error) {
       toast.error("Invalid credentials");
@@ -74,6 +74,17 @@ const LoginForm = () => {
             </div>
           </div>
 
+          <div className="flex items-center justify-between">
+            <div className="text-sm">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+          </div>
+
           <div>
             <button
               type="submit"
@@ -81,7 +92,10 @@ const LoginForm = () => {
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
-                <LoadingSpinner size="sm" className="mr-2" />
+                <div className="flex items-center">
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  <span>Signing in...</span>
+                </div>
               ) : (
                 "Sign in"
               )}

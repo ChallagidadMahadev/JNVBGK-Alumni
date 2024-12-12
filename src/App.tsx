@@ -8,8 +8,11 @@ import Hero from "./components/Hero";
 import Events from "./pages/Events";
 import Alumni from "./pages/Alumni";
 import News from "./pages/News";
+import BatchList from "./pages/BatchList";
 import LoginForm from "./components/auth/LoginForm";
 import RegisterForm from "./components/auth/RegisterForm";
+import ForgotPasswordForm from "./components/auth/ForgotPasswordForm";
+import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -28,8 +31,11 @@ function App() {
             <Route path="/events" element={<Events />} />
             <Route path="/alumni" element={<Alumni />} />
             <Route path="/news" element={<News />} />
+            <Route path="/batches" element={<BatchList />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
+            <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+            <Route path="/reset-password" element={<ResetPasswordForm />} />
             <Route
               path="/profile"
               element={

@@ -9,61 +9,6 @@ import { validateResetToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Login
-router.post('/login', asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-
-  // Find user
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
-
-  // Check password
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
-
-  // Generate token with no expiration
-  const token = jwt.sign(
-    { userId: user._id },
-    process.env.JWT_SECRET
-  );
-
-  // Return user data without password
-  const userWithoutPassword = { ...user.toObject() };
-  delete userWithoutPassword.password;
-
-  res.json({
-    token,
-    user: userWithoutPassword
-  });
-}));
-
-// Get current user
-router.get('/me', asyncHandler(async (req, res) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  
-  if (!token) {
-    return res.status(401).json({ message: 'Authentication required' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
-    
-    if (!user) {
-      return res.status(401).json({ message: 'User not found' });
-    }
-
-    res.json(user);
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-}));
-
-
 // Register
 router.post(
   "/register",
@@ -107,7 +52,39 @@ router.post(
   })
 );
 
+// Login
+router.post(
+  "/login",
+  asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
 
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate token
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // Return user data without password
+    const userWithoutPassword = { ...user.toObject() };
+    delete userWithoutPassword.password;
+
+    res.json({
+      token,
+      user: userWithoutPassword,
+    });
+  })
+);
 
 // Request password reset
 router.post(
@@ -174,6 +151,5 @@ router.post(
     res.json({ message: "Password updated successfully" });
   })
 );
-
 
 export default router;
