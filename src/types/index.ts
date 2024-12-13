@@ -32,7 +32,7 @@ export interface Alumni {
   phoneNumber?: string;
   showPhoneNumber?: boolean;
   address?: string;
-  house?: 'ARAVALI' | 'NILGIRI' | 'SHIVALIK' | 'UDAYAGIRI';
+  house?: 'ARAVALI' | 'NILGIRI' | 'SHIVALIK' | 'UDAIGIRI';
   profilePicture?: string;
   occupation?: string;
   occupationSubField?: string;
@@ -73,7 +73,7 @@ export const HOUSE_COLORS = {
   ARAVALI: 'blue',
   NILGIRI: 'green',
   SHIVALIK: 'red',
-  UDAYAGIRI: 'yellow'
+  UDAIGIRI: 'yellow'
 } as const;
 
 export const OCCUPATIONS = [

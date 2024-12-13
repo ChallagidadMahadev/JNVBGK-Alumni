@@ -72,7 +72,7 @@ router.post(
             let house = record.house?.toUpperCase();
             if (
               house &&
-              !["ARAVALI", "NILGIRI", "SHIVALIK", "UDAYAGIRI"].includes(house)
+              !["ARAVALI", "NILGIRI", "SHIVALIK", "UDAIGIRI"].includes(house)
             ) {
               house = undefined;
             }
@@ -146,7 +146,7 @@ router.put(
         }
         if (
           student.house &&
-          !["ARAVALI", "NILGIRI", "SHIVALIK", "UDAYAGIRI"].includes(
+          !["ARAVALI", "NILGIRI", "SHIVALIK", "UDAIGIRI"].includes(
             student.house
           )
         ) {

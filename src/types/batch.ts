@@ -9,7 +9,7 @@ export const BatchSchema = z.object({
   students: z.array(z.object({
     name: z.string(),
     rollNumber: z.string().optional(),
-    house: z.enum(['ARAVALI', 'NILGIRI', 'SHIVALIK', 'UDAYAGIRI']).optional(),
+    house: z.enum(['ARAVALI', 'NILGIRI', 'SHIVALIK', 'UDAIGIRI']).optional(),
     achievements: z.string().optional(),
     currentStatus: z.string().optional()
   })),
