@@ -30,7 +30,7 @@ const batchSchema = new mongoose.Schema(
         },
         house: {
           type: String,
-          enum: ["ARAVALI", "NILGIRI", "SHIVALIK", "UDAYAGIRI"],
+          enum: ["ARAVALI", "NILGIRI", "SHIVALIK", "UDAIGIRI"],
         },
         achievements: String,
         currentStatus: String,

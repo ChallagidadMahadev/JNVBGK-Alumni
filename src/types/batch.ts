@@ -20,12 +20,14 @@ export const BatchSchema = z.object({
 export type Batch = z.infer<typeof BatchSchema>;
 export type BatchStudent = Batch['students'][0];
 
-// Schema for batch upload form
-export const BatchUploadSchema = z.object({
-  batchNumber: z.number(),
-  title: z.string(),
-  year: z.number(),
-  file: z.instanceof(File)
-});
+// Form data type for batch upload
+export interface BatchUploadFormData {
+  batchNumber: number;
+  title: string;
+  year: number;
+}
 
-export type BatchUpload = z.infer<typeof BatchUploadSchema>;
+export interface BatchUploadProps {
+  onClose: () => void;
+  onSubmit: (formData: FormData) => Promise<void>;
+}
