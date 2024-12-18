@@ -87,6 +87,7 @@ export const OCCUPATIONS = [
   'Arts & Entertainment',
   'Agriculture',
   'Research & Academia',
+  'Architecture',
   'Others'
 ] as const;
 

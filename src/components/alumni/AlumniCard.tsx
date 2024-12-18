@@ -24,7 +24,7 @@ const AlumniCard: React.FC<AlumniCardProps> = ({ person, onClick }) => {
         return "rgb(34, 197, 94)"; // green-500
       case "SHIVALIK":
         return "rgb(239, 68, 68)"; // red-500
-      case "UDAYAGIRI":
+      case "UDAIGIRI":
         return "rgb(234, 179, 8)"; // yellow-500
       default:
         return "FFF";

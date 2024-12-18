@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
   },
   house: {
     type: String,
-    enum: ["ARAVALI", "NILGIRI", "SHIVALIK", "UDAYAGIRI"],
+    enum: ["ARAVALI", "NILGIRI", "SHIVALIK", "UDAIGIRI"],
   },
   address: String,
   profilePicture: String,
@@ -65,6 +65,7 @@ const userSchema = new mongoose.Schema({
       "Arts & Entertainment",
       "Agriculture",
       "Research & Academia",
+      "Architecture",
       "Others",
     ],
   },

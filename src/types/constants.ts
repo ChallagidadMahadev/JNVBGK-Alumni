@@ -16,6 +16,7 @@ export const OCCUPATIONS = [
   'Arts & Entertainment',
   'Agriculture',
   'Research & Academia',
+  'Architecture',
   'Others'
 ] as const;
 
@@ -88,8 +89,20 @@ export const OCCUPATION_SUBFIELDS = {
     'Social Sciences',
     'Humanities',
     'Others'
+  ],
+  'Architecture': [
+    'Residential Architecture',
+    'Commercial Architecture',
+    'Landscape Architecture',
+    'Interior Architecture',
+    'Urban Design',
+    'Sustainable Architecture',
+    'Restoration Architecture',
+    'Industrial Architecture',
+    'Others'
   ]
 } as const;
+
 
 export const PARTICIPATION_CATEGORIES = [
   'Education',
