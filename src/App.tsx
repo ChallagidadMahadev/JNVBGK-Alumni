@@ -19,6 +19,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import ManageEvents from "./pages/admin/ManageEvents";
 import ManageNews from "./pages/admin/ManageNews";
 import ManageAlumni from "./pages/admin/ManageAlumni";
+import FacultyPage from "./pages/Faculty";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/" element={<Hero />} />
             <Route path="/events" element={<Events />} />
             <Route path="/alumni" element={<Alumni />} />
+            <Route path="/faculty" element={<FacultyPage />} />
             <Route path="/news" element={<News />} />
             <Route path="/batches" element={<BatchList />} />
             <Route path="/login" element={<LoginForm />} />

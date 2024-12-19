@@ -3,6 +3,7 @@ import eventRoutes from "../routes/events.js";
 import newsRoutes from "../routes/news.js";
 import alumniRoutes from "../routes/alumni.js";
 import batchRoutes from "../routes/batches.js";
+import facultyRoutes from "../routes/faculty.js";
 
 export const configureRoutes = (app) => {
   app.use("/auth", authRoutes);
@@ -10,7 +11,7 @@ export const configureRoutes = (app) => {
   app.use("/news", newsRoutes);
   app.use("/alumni", alumniRoutes);
   app.use("/batches", batchRoutes);
-
+  app.use("/api/faculty", facultyRoutes);
   // Health check endpoint
   app.get("/health", (req, res) => {
     res.status(200).json({

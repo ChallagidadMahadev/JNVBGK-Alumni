@@ -38,6 +38,7 @@ const Navbar = () => {
 
   const navItems = [
     { path: "/alumni", label: "Alumni", icon: Users },
+    { path: "/faculty", label: "Faculty", icon: GraduationCap },
     { path: "/events", label: "Events", icon: Calendar },
     { path: "/news", label: "News", icon: Newspaper },
     { path: "/batches", label: "Batch List", icon: List },
