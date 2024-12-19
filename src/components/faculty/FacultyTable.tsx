@@ -20,6 +20,9 @@ const FacultyTable: React.FC<FacultyTableProps> = ({
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Sl No
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Name
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -39,7 +42,7 @@ const FacultyTable: React.FC<FacultyTableProps> = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {faculty.map((member) => (
+          {faculty.map((member, index) => (
             <motion.tr
               key={member.id}
               initial={{ opacity: 0 }}
@@ -47,6 +50,11 @@ const FacultyTable: React.FC<FacultyTableProps> = ({
               exit={{ opacity: 0 }}
               className="hover:bg-gray-50"
             >
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm font-medium text-gray-900">
+                  {(index + 1).toString().padStart(2, "0")}
+                </div>
+              </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
                   {member.name}
