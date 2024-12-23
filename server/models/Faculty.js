@@ -11,7 +11,7 @@ const facultySchema = new mongoose.Schema(
       type: String,
       trim: true,
       match: [
-        /^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/,
+        /^(\+91[\-\s]?)?[0]?(91)?[56789]\d{9}$/,
         "Please enter a valid Indian phone number",
       ],
     },
