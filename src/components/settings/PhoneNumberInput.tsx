@@ -26,7 +26,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
           <motion.input
             {...register("phoneNumber", {
               pattern: {
-                value: /^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/,
+                value: /^(\+91[\-\s]?)?[0]?(91)?[56789]\d{9}$/,
                 message: "Please enter a valid Indian phone number",
               },
             })}
