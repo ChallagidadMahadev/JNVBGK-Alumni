@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: function (v) {
-        return /^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/.test(v);
+        return /^(\+91[\-\s]?)?[0]?(91)?[56789]\d{9}$/.test(v);
       },
       message: (props) => `${props.value} is not a valid Indian phone number!`,
     },
